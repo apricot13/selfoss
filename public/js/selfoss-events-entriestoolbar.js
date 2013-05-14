@@ -21,7 +21,7 @@ selfoss.events.entriesToolbar = function(parent) {
     
     // open in new window
     parent.find('.entry-newwindow').unbind('click').click(function(e) {
-        window.open($(this).parents(".entry").children("a").eq(0).attr("href"));
+        window.open($(this).parents(".entry").children(".entry-source").attr("href"));
         e.preventDefault();
         return false;
     });
@@ -47,6 +47,19 @@ selfoss.events.entriesToolbar = function(parent) {
         return false;
     });
     
+    // share with pocket
+    parent.find('.entry-sharepocket').unbind('click').click(function(e) {
+        window.open(" https://getpocket.com/save?url="+encodeURIComponent($(this).parents(".entry").children("a").eq(0).attr("href"))+"&title="+encodeURIComponent($(this).parents(".entry").children(".entry-title").html()));
+        e.preventDefault();
+        return false;
+    });
+  
+    // share with e-mail
+    parent.find('.entry-shareemail').unbind('click').click(function(e) {
+        document.location.href = "mailto:?body="+encodeURIComponent($(this).parents(".entry").children("a").eq(0).attr("href"))+"&subject="+encodeURIComponent($(this).parents(".entry").children(".entry-title").html());
+        e.preventDefault();
+        return false;
+    });
     
     // only loggedin users
     if($('body').hasClass('loggedin')==true) {
@@ -61,10 +74,10 @@ selfoss.events.entriesToolbar = function(parent) {
             var setButton = function(starr) {
                 if(starr) {
                     button.addClass('active');
-                    button.html('unstar');
+                    button.html($('#lang').data('unstar'));
                 } else {
                     button.removeClass('active');
-                    button.html('star');
+                    button.html($('#lang').data('star'));
                 }
             };
             setButton(starr);
@@ -101,16 +114,16 @@ selfoss.events.entriesToolbar = function(parent) {
             var unread = $(this).hasClass('active')==true;
             var button = $("#entry"+id+" .entry-unread, #entrr"+id+" .entry-unread");
             var parent = $("#entry"+id+", #entrr"+id);
-            
+
             // update button
             var setButton = function(unread) {
                 if(unread) {
                     button.removeClass('active');
-                    button.html('mark as unread');
+                    button.html($('#lang').data('unmark'));
                     parent.removeClass('unread');
                 } else {
                     button.addClass('active');
-                    button.html('mark as read');
+                    button.html($('#lang').data('mark'));
                     parent.addClass('unread');
                 }
             };
@@ -137,8 +150,12 @@ selfoss.events.entriesToolbar = function(parent) {
                 if(typeof sourceCount != "number" || isNaN(sourceCount)==true)
                     sourceCount = 0;
                 sourceCount = unread ? sourceCount-1 : sourceCount+1;
-                if(sourceCount<=0)
+                if(sourceCount<=0) {
                     sourceCount = "";
+                    $('#source'+sourceId+'').removeClass('unread');
+                } else {
+                    $('#source'+sourceId+'').addClass('unread');
+                }
                 sourceNav.html(sourceCount);
                 
                 // update unread on tags
@@ -169,6 +186,7 @@ selfoss.events.entriesToolbar = function(parent) {
             
             $.ajax({
                 url: $('base').attr('href') + (unread ? 'mark/' : 'unmark/') + id,
+                data: { ajax: true },
                 type: 'POST',
                 error: function(jqXHR, textStatus, errorThrown) {
                     // rollback ui changes

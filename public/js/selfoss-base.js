@@ -21,12 +21,22 @@ var selfoss = {
         ajax: true
     },
 
+    /**
+     * instance of the currently running XHR that is used to reload the items list
+     */
+    activeAjaxReq: null,
     
     /**
      * initialize application
      */
     init: function() {
         jQuery(document).ready(function() {
+            // reduced init on login
+            if($('#login').length>0) {
+                $('#username').focus();
+                return;
+            }
+        
             // set items per page
             selfoss.filter.itemsPerPage = $('.entry').length;
             
@@ -43,7 +53,7 @@ var selfoss = {
     
     
     /**
-     * returns an array of id value pairs of all form elements in given element
+     * returns an array of name value pairs of all form elements in given element
      *
      * @return void
      * @param element containing the form elements
@@ -52,11 +62,11 @@ var selfoss = {
         var values = {};
         
         $(element).find(':input').each(function (i, el) {
-            // get only input elements with id
-            if($.trim($(el).attr('id')).length!=0) {
-                values[$(el).attr('id')] = $(el).val();
+            // get only input elements with name
+            if($.trim($(el).attr('name')).length!=0) {
+                values[$(el).attr('name')] = $(el).val();
                 if($(el).attr('type')=='checkbox')
-                    values[$(el).attr('id')] = $(el).attr('checked') ? 1 : 0;
+                    values[$(el).attr('name')] = $(el).attr('checked') ? 1 : 0;
             }
         });
         
@@ -74,7 +84,7 @@ var selfoss = {
     showErrors: function(form, errors) {
         $(form).find('span.error').remove();
         $.each(errors, function(key, val) {
-            form.find('#'+key).addClass('error').parent('li').append('<span class="error">'+val+'</span>');
+            form.find("[name='"+key+"']").addClass('error').parent('li').append('<span class="error">'+val+'</span>');
         });
     },
     
@@ -124,9 +134,17 @@ var selfoss = {
      * @return void
      */
     reloadList: function() {
+        if (selfoss.activeAjaxReq !== null)
+            selfoss.activeAjaxReq.abort();
+
+        if (location.hash == "#sources") {
+            location.hash = "";
+            return;
+        }
+
         $('#content').addClass('loading').html("");
-        
-        $.ajax({
+
+        selfoss.activeAjaxReq = $.ajax({
             url: $('base').attr('href'),
             type: 'GET',
             dataType: 'json',
@@ -140,15 +158,28 @@ var selfoss = {
                 $(document).scrollTop(0);
                 selfoss.events.entries();
                 selfoss.events.search();
-                location.hash = "";
+                
+                // make unread itemcount red
+                if(data.unread>0)
+                    $('.nav-filter-unread span').addClass('unread');
+                
+                // update tags
+                selfoss.refreshTags(data.tags);
+                
+                // update sources
+                selfoss.refreshSources(data.sources);
+
+                // clean up
+                $('#content').removeClass('loading');
+                selfoss.activeAjaxReq = null;
             },
             error: function(jqXHR, textStatus, errorThrown) {
-                if (textStatus == "parsererror")
+                if (textStatus == "abort")
+                    return;
+                else if (textStatus == "parsererror")
                     location.reload();
-                alert('Load list error: '+errorThrown);
-            },
-            complete: function(jqXHR, textStatus) {
-                $('#content').removeClass('loading');
+                else if (errorThrown)
+                    alert('Load list error: ' + errorThrown);
             }
         });
     },
@@ -164,7 +195,7 @@ var selfoss = {
         $('#nav-tags li:not(:first)').remove();
         
         $.ajax({
-            url: $('base').attr('href')+'tags',
+            url: $('base').attr('href')+'tagslist',
             type: 'GET',
             success: function(data) {
                 $('#nav-tags').append(data);
@@ -177,6 +208,58 @@ var selfoss = {
                 $('#nav-tags').removeClass('loading');
             }
         });
+    },
+    
+    
+    /**
+     * refresh taglist.
+     *
+     * @return void
+     * @param tags the new taglist as html
+     */
+    refreshTags: function(tags) {
+        var currentTag = $('#nav-tags li').index($('#nav-tags .active'));
+        $('.color').spectrum('destroy');
+        $('#nav-tags li:not(:first)').remove();
+        $('#nav-tags').append(tags);
+        if(currentTag>=0)
+            $('#nav-tags li:eq('+currentTag+')').addClass('active');
+        selfoss.events.navigation();
+    },
+    
+    
+    /**
+     * refresh sources list.
+     *
+     * @return void
+     * @param sources the new sourceslist as html
+     */
+    refreshSources: function(sources) {
+        var currentSource = $('#nav-sources li').index($('#nav-sources .active'));
+        $('#nav-sources li').remove();
+        $('#nav-sources').append(sources);
+        if(currentSource>=0)
+            $('#nav-sources li:eq('+currentSource+')').addClass('active');
+        selfoss.events.navigation();
+    },
+    
+    
+    /**
+     * anonymize links
+     *
+     * @return void
+     * @param parent element
+     */
+    anonymize: function(parent) {
+        var anonymizer = $('#config').data('anonymizer');
+        if(anonymizer.length>0) {
+            parent.find('a').each(function(i,link) {
+                link = $(link);
+                if(typeof link.attr('href') != "undefined" && link.attr('href').indexOf(anonymizer)!=0) {
+                    link.attr('href', anonymizer + link.attr('href'));
+                }
+            });
+        }
     }
 };
 

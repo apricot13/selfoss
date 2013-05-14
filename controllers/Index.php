@@ -14,6 +14,7 @@ class Index extends BaseController {
     
     /**
      * home site
+     * html
      *
      * @return void
      */
@@ -30,17 +31,13 @@ class Index extends BaseController {
         if(count($_GET)>0)
             $options = $_GET;
         
-        // load tags
-        $tagsDao = new \daos\Tags();
-        $tags = $tagsDao->get();
-        
-        // load sources
-        $sourcesDao = new \daos\Sources();
-        $sources = $sourcesDao->get();
-        
         // get search param
         if(isset($options['search']) && strlen($options['search'])>0)
             $this->view->search = $options['search'];
+        
+        // load tags
+        $tagsDao = new \daos\Tags();
+        $tags = $tagsDao->get();
         
         // load items
         $itemsHtml = $this->loadItems($options, $tags);
@@ -52,23 +49,27 @@ class Index extends BaseController {
         $this->view->statsUnread = $itemsDao->numberOfUnread();
         $this->view->statsStarred = $itemsDao->numberOfStarred();
         
-        // ajax call = only send entries and statistics not full template
-        if(isset($options['ajax'])) {
-            $this->view->jsonSuccess(array(
-                "entries" => $this->view->content,
-                "all"     => $this->view->statsAll,
-                "unread"  => $this->view->statsUnread,
-                "starred" => $this->view->statsStarred
-            ));
-        }
-        
-        // load tags
+        // prepare tags display list
         $tagsController = new \controllers\Tags();
         $this->view->tags = $tagsController->renderTags($tags);
         
         // prepare sources display list
+        $sourcesDao = new \daos\Sources();
+        $sources = $sourcesDao->get();
         $sourcesController = new \controllers\Sources();
         $this->view->sources = $sourcesController->renderSources($sources);
+        
+        // ajax call = only send entries and statistics not full template
+        if(isset($options['ajax'])) {
+            $this->view->jsonSuccess(array(
+                "entries"  => $this->view->content,
+                "all"      => $this->view->statsAll,
+                "unread"   => $this->view->statsUnread,
+                "starred"  => $this->view->statsStarred,
+                "tags"     => $this->view->tags,
+                "sources"  => $this->view->sources
+            ));
+        }
         
         // show as full html page
         $this->view->publicMode = \F3::get('auth')->isLoggedin()!==true && \F3::get('public')==1;
@@ -79,6 +80,7 @@ class Index extends BaseController {
     
     /**
      * password hash generator
+     * html
      *
      * @return void
      */
@@ -93,6 +95,7 @@ class Index extends BaseController {
     
     /**
      * check and show login/logout
+     * html
      *
      * @return void
      */
@@ -130,6 +133,62 @@ class Index extends BaseController {
     
     
     /**
+     * login for api json access
+     * json
+     *
+     * @return void
+     */
+    public function login() {
+        $view = new \helpers\View();
+        $username = isset($_REQUEST["username"]) ? $_REQUEST["username"] : '';
+        $password = isset($_REQUEST["password"]) ? $_REQUEST["password"] : '';
+        
+        if(\F3::get('auth')->login($username,$password)==true)
+            $view->jsonSuccess(array(
+                'success' => true
+            ));
+        
+        $view->jsonSuccess(array(
+            'success' => false
+        ));
+    }
+    
+
+    /**
+     * logout for api json access
+     * json
+     *
+     * @return void
+     */
+    public function logout() {
+        $view = new \helpers\View();
+        \F3::get('auth')->logout();
+        $view->jsonSuccess(array(
+            'success' => true
+        ));
+    }
+    
+    
+    /**
+     * update feeds
+     * text
+     *
+     * @return void
+     */
+    public function update() {
+        // only allow access for localhost and loggedin users
+        if ($_SERVER['REMOTE_ADDR'] !== $_SERVER['SERVER_ADDR'] && $_SERVER['REMOTE_ADDR'] !== "127.0.0.1" && \F3::get('auth')->isLoggedin() != 1)
+            die("unallowed access");
+    
+        // update feeds
+        $loader = new \helpers\ContentLoader();
+        $loader->update();
+        
+        echo "finished";
+    }
+    
+    
+    /**
      * load items
      *
      * @return html with items
@@ -155,10 +214,10 @@ class Index extends BaseController {
         }
 
         if(strlen($itemsHtml)==0) {
-            $itemsHtml = '<div class="stream-empty">no entries found</div>';
+            $itemsHtml = '<div class="stream-empty">'. \F3::get('lang_no_entries').'</div>';
         } else {
             if($itemDao->hasMore())
-                $itemsHtml .= '<div class="stream-more"><span>more</span></div>';
+                $itemsHtml .= '<div class="stream-more"><span>'. \F3::get('lang_more').'</span></div>';
         }
         
         return $itemsHtml;

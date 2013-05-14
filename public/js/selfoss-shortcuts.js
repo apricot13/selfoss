@@ -5,48 +5,163 @@ selfoss.shortcuts = {
      * init shortcuts
      */
     init: function() { 
-        // next
-        $(document).bind('keydown', 'space', function() { selfoss.shortcuts.nextprev('next', true, false); return false; });
-        $(document).bind('keydown', 'n', function() { selfoss.shortcuts.nextprev('next', false); return false; });
-        $(document).bind('keydown', 'j', function() { selfoss.shortcuts.nextprev('next', true); return false; });
-        
-        // prev
-        $(document).bind('keydown', 'shift+space', function() { selfoss.shortcuts.nextprev('prev', true); return false; });
-        $(document).bind('keydown', 'p', function() { selfoss.shortcuts.nextprev('prev', false); return false; });
-        $(document).bind('keydown', 'k', function() { selfoss.shortcuts.nextprev('prev', true); return false; });
-        
-        // star/unstar
-        $(document).bind('keydown', 's', function() {
-            $('.entry.selected .entry-starr').click();
-        });
-        
-        // mark/unmark
-        $(document).bind('keydown', 'm', function() {
-            $('.entry.selected .entry-unread').click();
-        });
-        
-        // open target
-        $(document).bind('keydown', 'v', function() {
-            window.open($('.entry.selected .entry-source').attr('href'));
-        });
-        
-        // mark all as read
-        $(document).bind('keydown', 'ctrl+m', function() {
-            $('#nav-mark').click();
+        // 'space': next article
+        $(document).bind('keydown', 'space', function(e) {
+            var selected = $('.entry.selected');
+            if(selected.length>0 && selected.find('.entry-content').is(':visible')==false) {
+                selected.find('.entry-title').click();
+            } else {
+                selfoss.shortcuts.nextprev('next', true);
+            }
+            e.preventDefault();
+            return false;
         });
 
-        // throw (mark as read & open next)
-        $(document).bind('keydown', 't', function() {
+        // 'n': next article
+        $(document).bind('keydown', 'n', function(e) {
+            selfoss.shortcuts.nextprev('next', false);
+            e.preventDefault();
+            return false;
+        });
+
+        // 'right cursor': next article
+        $(document).bind('keydown', 'right', function(e) {
+            selfoss.shortcuts.entrynav('next');
+            e.preventDefault();
+            return false;
+        });
+
+        // 'j': next article
+        $(document).bind('keydown', 'j', function(e) {
+            selfoss.shortcuts.nextprev('next', true);
+            e.preventDefault();
+            return false;
+        });
+        
+        // 'shift+space': previous article
+        $(document).bind('keydown', 'shift+space', function(e) {
+            selfoss.shortcuts.nextprev('prev', true);
+            e.preventDefault();
+            return false;
+        });
+
+        // 'p': previous article
+        $(document).bind('keydown', 'p', function(e) {
+            selfoss.shortcuts.nextprev('prev', false);
+            e.preventDefault();
+            return false;
+        });
+
+        // 'left': previous article
+        $(document).bind('keydown', 'left', function(e) {
+            selfoss.shortcuts.entrynav('prev');
+            e.preventDefault();
+            return false;
+        });
+
+        // 'k': previous article
+        $(document).bind('keydown', 'k', function(e) {
+            selfoss.shortcuts.nextprev('prev', true);
+            e.preventDefault();
+            return false;
+        });
+        
+        // 's': star/unstar
+        $(document).bind('keydown', 's', function(e) {
+            selfoss.events.entriesToolbar($('.entry.selected'));
+            $('.entry.selected .entry-starr').click();
+            e.preventDefault();
+            return false;
+        });
+        
+        // 'm': mark/unmark
+        $(document).bind('keydown', 'm', function(e) {
+            selfoss.events.entriesToolbar($('.entry.selected'));
+            $('.entry.selected .entry-unread').click();
+            e.preventDefault();
+            return false;
+        });
+        
+        // 'o': open/close entry
+        $(document).bind('keydown', 'o', function(e) {
+            $('.entry.selected').find('h2').click();
+            e.preventDefault();
+            return false;
+        });
+        
+        // 'Shift + o': close open entries
+        $(document).bind('keydown', 'Shift+o', function(e) {
+            e.preventDefault();
+            $('.entry-content, .entry-toolbar').hide();
+        });
+        
+        // 'v': open target
+        $(document).bind('keydown', 'v', function(e) {
+            window.open($('.entry.selected .entry-source').attr('href'));
+            e.preventDefault();
+            return false;
+        });
+        
+        // 'Shift + v': open target and mark read
+        $(document).bind('keydown', 'Shift+v', function(e) {
+            e.preventDefault();
+            
+            selfoss.events.entriesToolbar($('.entry.selected'));
+            
+            // mark item as read
+            if($('.entry.selected .entry-unread').hasClass('active')) {
+                $('.entry.selected .entry-unread').click();
+            }
+            
+            // open item in new window
+            $('.entry.selected .entry-source').click();
+        });
+        
+        // 'r': Reload the current view
+        $(document).bind('keydown', 'r', function(e) {
+            selfoss.reloadList();
+            e.preventDefault();
+            return false;
+        });
+        
+        // 'Ctrl+m': mark all as read
+        $(document).bind('keydown', 'ctrl+m', function(e) {
+            $('#nav-mark').click();
+            e.preventDefault();
+            return false;
+        });
+
+        // 't': throw (mark as read & open next)
+        $(document).bind('keydown', 't', function(e) {
             $('.entry.selected.unread .entry-unread').click();
             selfoss.shortcuts.nextprev('next', true);
             return false;
         });
 
         // throw (mark as read & open previous)
-        $(document).bind('keydown', 'Shift+t', function() {
+        $(document).bind('keydown', 'Shift+t', function(e) {
             $('.entry.selected.unread .entry-unread').click();
             selfoss.shortcuts.nextprev('prev', true);
+            e.preventDefault();
             return false;
+        });
+        
+        // 'Shift+n': switch to newest items overview / menu item
+        $(document).bind('keydown', 'Shift+n', function(e) {
+            e.preventDefault();
+            $('#nav-filter-newest').click();
+        });
+        
+        // 'Shift+u': switch to unread items overview / menu item
+        $(document).bind('keydown', 'Shift+u', function(e) {
+            e.preventDefault();
+            $('#nav-filter-unread').click();
+        });
+        
+        // 'Shift+s': switch to starred items overview / menu item
+        $(document).bind('keydown', 'Shift+s', function(e) {
+            e.preventDefault();
+            $('#nav-filter-starred').click();
         });
     },
     
@@ -99,14 +214,21 @@ selfoss.shortcuts = {
             current.click().removeClass('selected').prev().addClass('selected');
         
         // open?
-        if(open && current.find('.entry-thumbnail').length==0) {
+        if(open) {
             var content = current.find('.entry-content');
             // load images not on mobile devices
-            if(selfoss.isMobile()==false)
+            if(selfoss.isMobile()==false) {
                 content.lazyLoadImages();
+                current.next().find('.entry-content').lazyLoadImages();
+            }
+            // anonymize
+            selfoss.anonymize(content);
             content.show();
             current.find('.entry-toolbar').show();
             selfoss.events.entriesToolbar(current);
+            // automark as read
+            if($('#config').data('auto_mark_as_read')=="1" && current.hasClass('unread'))
+                current.find('.entry-unread').click();
         }
         
         // scroll to element
@@ -138,4 +260,16 @@ selfoss.shortcuts = {
         }
     },
     
+    
+    /**
+     * entry navigation (next/prev) with keys
+     * @param direction
+     */
+    entrynav: function(direction) {
+        if(typeof direction == "undefined" || (direction!="next" && direction!="prev"))
+            direction = "next";
+        
+        var content = $('.entry-content').is(':visible');
+            selfoss.shortcuts.nextprev(direction, content);
+    }
 }

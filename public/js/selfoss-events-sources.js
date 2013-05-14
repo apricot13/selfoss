@@ -53,26 +53,30 @@ selfoss.events.sources = function() {
         if(id!=false)
             url = url + '/' + id;
         
+        // get values and params
+        var values = selfoss.getValues(parent);
+        values['ajax'] = true;
+        
         $.ajax({
             url: url,
             type: 'POST',
             dataType: 'json',
-            data: selfoss.getValues(parent),
+            data: values,
             success: function(response) {
                 var id = response['id'];
                 parent.attr('id', 'source'+id);
                 
                 // show saved text
-                parent.find('.source-showparams').addClass('saved').html('saved');
+                parent.find('.source-showparams').addClass('saved').html($('#lang').data('source_saved'));
                 window.setTimeout(function() {
-                    parent.find('.source-showparams').removeClass('saved').html('edit');
+                    parent.find('.source-showparams').removeClass('saved').html($('#lang').data('source_edit'));
                 }, 10000);
                 
                 // hide input form
                 parent.find('.source-edit-form').hide();
                 
                 // update title
-                parent.find('.source-title').html(parent.find('#title').val());
+                parent.find('.source-title').html(parent.find("input[name='title']").val());
                 
                 // show all links for new items
                 parent.removeClass('source-new');
@@ -84,6 +88,8 @@ selfoss.events.sources = function() {
                 // update sources
                 $('#nav-sources li').remove();
                 $('#nav-sources').append(response.sources);
+                
+                selfoss.events.navigation();
             },
             error: function(jqXHR, textStatus, errorThrown) {
                 selfoss.showErrors(parent, $.parseJSON(jqXHR.responseText));
@@ -96,7 +102,7 @@ selfoss.events.sources = function() {
     
     // delete source
     $('.source-delete').unbind('click').click(function() {
-        var answer = confirm('really delete this source?');
+        var answer = confirm($('#lang').data('source_warn'));
         if(answer==false)
             return;
         
@@ -111,15 +117,16 @@ selfoss.events.sources = function() {
         
         // delete on server
         $.ajax({
-            url: $('base').attr('href')+'source/'+id,
-            type: 'DELETE',
+            url: $('base').attr('href')+'source/delete/'+id,
+            type: 'POST',
             success: function() {
                 parent.fadeOut('fast', function() {
                     $(this).remove();
                 });
                 
-                // reload tags
+                // reload tags and remove source from navigation
                 selfoss.reloadTags();
+                $('#nav-sources li#'+parent.attr('id')).remove();
             },
             error: function(jqXHR, textStatus, errorThrown) {
                 parent.find('.source-edit-delete').removeClass('loading');
@@ -140,7 +147,7 @@ selfoss.events.sources = function() {
         params.show();
         if($.trim(val).length==0) {
             params.html('');
-            selfoss.resize();
+            selfoss.events.resize();
             return;
         }
         params.addClass('loading');
@@ -150,11 +157,11 @@ selfoss.events.sources = function() {
             type: 'GET',
             success: function(data) {
                 params.removeClass('loading').html(data);
-                selfoss.resize();
+                selfoss.events.resize();
             },
             error: function(jqXHR, textStatus, errorThrown) {
                 params.removeClass('loading').append('<li class="error">'+errorThrown+'</li>');
-                selfoss.resize();
+                selfoss.events.resize();
             }
         });
     });

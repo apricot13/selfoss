@@ -18,7 +18,7 @@ class Items extends Database {
      * results or not
      * @var bool
      */
-    private $hasMore = false;
+    protected $hasMore = false;
 
     
     /**
@@ -87,6 +87,10 @@ class Items extends Database {
      * @param mixed $values
      */
     public function add($values) {
+        // don't add items twice
+        if($this->exists($values['uid'])===true)
+            return;
+        
         \F3::get('db')->exec('INSERT INTO items (
                     datetime, 
                     title, 
@@ -134,19 +138,22 @@ class Items extends Database {
      */
     public function exists($uid) {
         $res = \F3::get('db')->exec('SELECT COUNT(*) AS amount FROM items WHERE uid=:uid',
-                    array(':uid' => $uid));
+                    array( ':uid' => array($uid, \PDO::PARAM_STR) ) );
         return $res[0]['amount']>0;
     }
     
     
     /**
-     * cleanup old items
+     * cleanup orphaned and old items
      *
      * @return void
-     * @param DateTime $date date to delete all items older than this value
+     * @param DateTime $date date to delete all items older than this value [optional]
      */
-    public function cleanup(\DateTime $date) {
-        \F3::get('db')->exec('DELETE FROM items WHERE starred=0 AND datetime<:date',
+    public function cleanup(\DateTime $date = NULL) {
+        \F3::get('db')->exec('DELETE FROM items USING items LEFT JOIN sources
+                                ON items.source=sources.id WHERE sources.id IS NULL');
+        if ($date !== NULL)
+            \F3::get('db')->exec('DELETE FROM items WHERE starred=0 AND datetime<:date',
                     array(':date' => $date->format('Y-m-d').' 00:00:00'));
     }
     
@@ -194,6 +201,10 @@ class Items extends Database {
         // set limit
         if(!is_numeric($options['items']) || $options['items']>200)
             $options['items'] = \F3::get('items_perpage');
+        
+        // set offset
+        if(is_numeric($options['offset'])===false)
+            $options['offset'] = 0;
         
         // first check whether more items are available
         $result = \F3::get('db')->exec('SELECT items.id
@@ -327,7 +338,7 @@ class Items extends Database {
         if(is_numeric($sourceid)===false)
             return false;
         
-        $res = \F3::get('db')->exec('SELECT icon FROM items WHERE source=:sourceid AND icon!=0 ORDER BY ID DESC LIMIT 0,1',
+        $res = \F3::get('db')->exec('SELECT icon FROM items WHERE source=:sourceid AND icon!=0 AND icon!="" ORDER BY ID DESC LIMIT 0,1',
                     array(':sourceid' => $sourceid));
         if(count($res)==1)
             return $res[0]['icon'];
@@ -371,7 +382,7 @@ class Items extends Database {
                    WHERE starred=1');
         return $res[0]['amount'];
     }
-
+    
     
     /**
      * returns the amount of unread entries in database per tag
@@ -390,7 +401,7 @@ class Items extends Database {
             array(':tag' => "%,".$tag.",%"));
         return $res[0]['amount'];
     }
-
+    
     
     /**
      * returns the amount of unread entries in database per source

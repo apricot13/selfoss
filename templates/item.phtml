@@ -27,24 +27,26 @@
     <!-- title -->
     <h2 class="entry-title"><?PHP echo $title; ?></h2>
     
-    <div class="entry-tags">
+    <span class="entry-tags">
         <?PHP foreach($this->item['tags'] as $tag => $color) : ?>
-            <div class="entry-tags-tag" style="background-color:<?PHP echo $color; ?>"><?PHP echo $tag; ?></div>
+            <span class="entry-tags-tag" style="background-color:<?PHP echo $color; ?>"><?PHP echo $tag; ?></span>
         <?PHP endforeach; ?>
-    </div>
+    </span>
     
     <!-- source -->
-    <a href="<?PHP echo $this->item['link']; ?>" class="entry-source entry-source<?PHP echo $this->item['source']; ?>" target="_blank"><?PHP echo $sourcetitle ?></a>
-    
+    <a href="<?PHP echo trim(\F3::get('anonymizer')) . $this->item['link']; ?>" class="entry-source entry-source<?PHP echo $this->item['source']; ?>" target="_blank"><?PHP echo $sourcetitle ?></a>
+
+    <span class="entry-separator">&bull;</span>
+
     <!-- datetime -->
-    <div class="entry-datetime">
-        &bullet; <?PHP echo $date; ?>
-    </div>
+    <span class="entry-datetime">
+        <?PHP echo $date; ?>
+    </span>
     
     <!-- thumbnail -->
     <?PHP if(isset($this->item['thumbnail']) && strlen(trim($this->item['thumbnail']))>0) : ?>
     <div class="entry-thumbnail">
-        <a href="<?PHP echo $this->item['link']; ?>"><img src="<?PHP echo 'thumbnails/'.$this->item['thumbnail']; ?>" alt="<?PHP echo $this->item['title']; ?>" /></a>
+        <a href="<?PHP echo trim(\F3::get('anonymizer')) . $this->item['link']; ?>" target="_blank"><img src="<?PHP echo 'thumbnails/'.$this->item['thumbnail']; ?>" alt="<?PHP echo $this->item['title']; ?>" /></a>
     </div>
     <?PHP endif; ?>
     
@@ -53,21 +55,26 @@
         <?PHP echo $content; ?>
         
         <ul class="entry-smartphone-share">
-            <li class="entry-sharegoogle">google</li>
-            <li class="entry-sharetwitter">twitter</li>
-            <li class="entry-sharefacebook">facebook</li>
+            <li class="entry-newwindow"><?PHP echo \F3::get('lang_open_window')?></li>
+            <li class="entry-sharegoogle" title="google">google</li>
+            <li class="entry-sharetwitter" title="twitter">twitter</li>
+            <li class="entry-sharefacebook" title="facebook">facebook</li>
+            <li class="entry-sharepocket" title="pocket">pocket</li>
+            <li class="entry-shareemail" title="email">email</li>
         </ul>
     </div>
     
     <!-- toolbar -->
     <ul class="entry-toolbar">
-        <li class="entry-starr <?PHP echo $this->item['starred']==1 ? 'active' : ''; ?>"><?PHP echo $this->item['starred']==1 ? 'unstar' : 'star'; ?></li>
-        <li class="entry-unread <?PHP echo $this->item['unread']==1 ? 'active' : ''; ?>"><?PHP echo $this->item['unread']==1 ? 'mark as read' : 'mark as unread'; ?></li>
-        <li class="entry-newwindow">open</li>
-        <li class="entry-loadimages">load images</li>
-        <li class="entry-sharegoogle entry-share">google</li>
-        <li class="entry-sharetwitter entry-share">twitter</li>
-        <li class="entry-sharefacebook entry-share">facebook</li>
+        <li class="entry-starr <?PHP echo $this->item['starred']==1 ? 'active' : ''; ?>"><?PHP echo $this->item['starred']==1 ? \F3::get('lang_unstar') : \F3::get('lang_star'); ?></li>
+        <li class="entry-unread <?PHP echo $this->item['unread']==1 ? 'active' : ''; ?>"><?PHP echo $this->item['unread']==1 ? \F3::get('lang_mark') : \F3::get('lang_unmark'); ?></li>
+        <li class="entry-newwindow"><?PHP echo \F3::get('lang_open_window')?></li>
+        <li class="entry-loadimages"><?PHP echo \F3::get('lang_load_img')?> </li>
+        <li class="entry-sharegoogle entry-share" title="google">&nbsp;</li>
+        <li class="entry-sharetwitter entry-share" title="twitter">&nbsp;</li>
+        <li class="entry-sharefacebook entry-share" title="facebook">&nbsp;</li>
+        <li class="entry-sharepocket entry-share" title="pocket">&nbsp;</li>
+        <li class="entry-shareemail entry-share" title="email">&nbsp;</li>
         <li class="entry-close"></li>
     </ul>
 </div>

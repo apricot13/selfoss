@@ -14,15 +14,18 @@ class Tags extends BaseController {
 
     /**
      * returns all tags
+     * html
      *
      * @return void
      */
-    public function tags() {
+    public function tagslist() {
         echo $this->tagsListAsString();
     }
     
+    
     /**
      * returns all tags
+     * html
      *
      * @return void
      */
@@ -31,36 +34,15 @@ class Tags extends BaseController {
         return $this->renderTags($tagsDao->get());
     }
     
-    /**
-     * set tag color
-     *
-     * @return void
-     */
-    public function tagset() {
-        $tag = $_POST['tag'];
-        $color = $_POST['color'];
-        
-        if(!isset($tag) || strlen(trim($tag))==0)
-            $this->view->error('invalid or no tag given');
-        if(!isset($color) || strlen(trim($color))==0)
-            $this->view->error('invalid or no color given');
-            
-        $tagsDao = new \daos\Tags();
-        $tagsDao->saveTagColor($tag, $color);
-        $this->view->jsonSuccess(array('success' => true));
-    }
     
     /**
      * returns all tags
+     * html
      *
      * @return void
      */
     public function renderTags($tags) {
         $html = "";
-        if (!$this->view) {
-            $this->view = new \helpers\View();  
-            return $html;
-        }
         $itemsDao = new \daos\Items();
         foreach($tags as $tag) {
             $this->view->tag = $tag['tag'];
@@ -70,5 +52,49 @@ class Tags extends BaseController {
         }
         
         return $html;
+    }
+    
+    
+    /**
+     * set tag color
+     *
+     * @return void
+     */
+    public function color() {
+    
+        // read data
+        parse_str(\F3::get('BODY'),$data);
+    
+        $tag = $data['tag'];
+        $color = $data['color'];
+        
+        if(!isset($tag) || strlen(trim($tag))==0)
+            $this->view->error('invalid or no tag given');
+        if(!isset($color) || strlen(trim($color))==0)
+            $this->view->error('invalid or no color given');
+            
+        $tagsDao = new \daos\Tags();
+        $tagsDao->saveTagColor($tag, $color);
+        $this->view->jsonSuccess(array(
+            'success' => true
+        ));
+    }
+    
+    
+    /**
+     * returns all tags
+     * html
+     *
+     * @return void
+     */
+    public function listTags() {
+        $tagsDao = new \daos\Tags();
+        $tags = $tagsDao->get();
+        
+        $itemsDao = new \daos\Items();
+        for($i=0; $i<count($tags); $i++)
+            $tags[$i]['unread'] = $itemsDao->numberOfUnreadForTag($tags[$i]['tag']);
+        
+        $this->view->jsonSuccess($tags);
     }
 }

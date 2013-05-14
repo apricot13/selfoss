@@ -22,9 +22,12 @@ class Sources extends Database {
      * @param mixed $params depends from spout
      */
     public function add($title, $tags, $spout, $params) {
+        // sanitize tag list
+        $tags = implode(',', preg_split('/\s*,\s*/', trim($tags), -1, PREG_SPLIT_NO_EMPTY));
+
         \F3::get('db')->exec('INSERT INTO sources (title, tags, spout, params) VALUES (:title, :tags, :spout, :params)',
                     array(
-                        ':title'  => $title,
+                        ':title'  => trim($title),
                         ':tags'   => $tags,
                         ':spout'  => $spout,
                         ':params' => htmlentities(json_encode($params))
@@ -46,9 +49,12 @@ class Sources extends Database {
      * @param mixed $params the new params
      */
     public function edit($id, $title, $tags, $spout, $params) {
+        // sanitize tag list
+        $tags = implode(',', preg_split('/\s*,\s*/', trim($tags), -1, PREG_SPLIT_NO_EMPTY));
+
         \F3::get('db')->exec('UPDATE sources SET title=:title, tags=:tags, spout=:spout, params=:params WHERE id=:id',
                     array(
-                        ':title'  => $title,
+                        ':title'  => trim($title),
                         ':tags'  => $tags,
                         ':spout'  => $spout,
                         ':params' => htmlentities(json_encode($params)),
@@ -86,6 +92,35 @@ class Sources extends Database {
                         ':id'    => $id,
                         ':error' => $error
                     ));
+    }
+
+
+    /**
+     * sets the last updated timestamp
+     *
+     * @return void
+     * @param int $id the source id
+     */
+    public function saveLastUpdate($id) {
+        \F3::get('db')->exec('UPDATE sources SET lastupdate=:lastupdate WHERE id=:id',
+                    array(
+                        ':id'         => $id,
+                        ':lastupdate' => time()
+                    ));
+    }
+
+
+    /**
+     * returns all sources
+     *
+     * @return mixed all sources
+     */
+    public function getByLastUpdate() {
+        $ret = \F3::get('db')->exec('SELECT id, title, tags, spout, params, error FROM sources ORDER BY lastupdate ASC');
+        $spoutLoader = new \helpers\SpoutLoader();
+        for($i=0;$i<count($ret);$i++)
+            $ret[$i]['spout_obj'] = $spoutLoader->get( $ret[$i]['spout'] );
+        return $ret;
     }
     
     

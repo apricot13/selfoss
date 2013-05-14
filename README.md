@@ -4,7 +4,7 @@ selfoss
 Copyright (c) 2013 Tobias Zeising, tobias.zeising@aditu.de  
 http://selfoss.aditu.de  
 Licensed under the GPLv3 license  
-Version 2.4-SNAPSHOT
+Version 2.8-SNAPSHOT
 
 
 INSTALLATION
@@ -12,7 +12,7 @@ INSTALLATION
 
 1. Upload all files of this folder (IMPORTANT: also upload the invisible .htaccess files)
 2. Make the directories data/cache, data/favicons, data/logs, data/thumbnails, data/sqlite and public/ writeable
-3. Insert database access data in config.ini (see below -- you have not to change anything if you would like to use sqlite)
+3. Insert database access data in config.ini (see below -- you don't have to change anything if you want to use sqlite)
 3. You don't have to install the database, it will be created automatically
 4. Create cronjob for updating feeds and point it to http://yourselfossurl.com/update via wget or curl. You can also execute the update.php from commandline.
 
@@ -50,7 +50,52 @@ Visit the page http://yourselfossurl.com/opml for importing your OPML File. If y
 CHANGELOG
 ---------
 
-Version 2.4-SNAPSHOT
+Version 2.8-SNAPSHOT
+* new Polish translation (thanks a lot to Piotr Dymacz)
+* improved Expires section and Compression in .htaccess (thanks a lot to S Anand)
+
+Version 2.7
+* new spout for instapaper (thanks a lot to janeczku)
+* new Hungarian translation (thanks a lot to Sancho)
+* fix keyboard shortcut on some browsers
+* new spout for youtube channels (thanks a lot to Arndt Staudinger)
+* new rss feed for selfoss releases: http://selfoss.aditu.de/feed.php
+* fix bug on removing search terms (thanks a lot to ochristi)
+* translation for login page (thanks a lot to jicho)
+* new japanese language file (thanks a lot to wowo)
+* new shortcuts (thanks a lot to jicho)
+* fix issues with refreshing the items list and slow ajax requests (thanks a lot to Sean Rand)
+* don't leave behind sp-container divs when refreshing the tags (thanks a lot to Sean Rand)
+* clean up orphaned items of deleted sources (thanks a lot to Sean Rand)
+* update fat free php framework to newest versoin 3.0.6
+* only allow update for localhost or loggedin users (thanks a lot to Tiouss)
+* added Facebook page feed (thanks a lot to Thomas Muguet)
+* fix memory bug on icon generation (thanks a lot to Matthieu Codron)
+* new opml export (thanks a lot to Sean Rand)
+* new norwegian translation (thanks a lot to Kjetil Elde)
+* set default title if no one was given by the feed
+
+Version 2.6
+* fixed OPML import for other formats (thanks a lot to Remy Gardette)
+* fix deletion of sources (no longer bad request)
+* disable tag click on smartphone
+* shortcuts mark/unmark as read and star/unstar also available on closed articles
+* fix tag list refresh
+
+Version 2.5
+* new navigation with right/left cursor (thanks a lot to jicho)
+* replace &bullet; for IE compatibility
+* fix re-initialize entry events on screen width change (thanks a lot to Sean Rand)
+* allow optional userdefined user.css (thanks a lot to Jean Baptiste Favre)
+* some smaller css tweaks (thanks a lot to Sean Rand)
+* new parameter use_system_font for using Arial instead of Open Sans
+* new italian language file (thanks a lot to David Chionne)
+* fix duplicate article fetching on uids with more than 255 characters
+* add integrated json api
+* add error handling for feeds with wrong link
+* new swedish translation (thanks a lot to andersgd)
+
+Version 2.4
 * prevent error on icons parsing error
 * new homepage parameter (thanks a lot to Jean Baptiste Favre)
 * new button for open an articles source
@@ -64,6 +109,25 @@ Version 2.4-SNAPSHOT
 * show unread items per tag in taglist (thanks a lot to Fedor Bezrukov)
 * show list of sources for filtering (thanks a lot to Fedor Bezrukov)
 * use more eye catching unread stats in main navigation
+* show source title in selfoss RSS feed (thanks a lot to Darkwing1)
+* load sources for update by last update time (thanks a lot to Lars Formella)
+* Opening feed search focuses the search input field
+* Scroll blockquotes and pre on overflow (especially good for mobile devices)
+* new option for automatically mark items as read
+* new share buttons for email and pocket (thanks a lot to Francis Noel)
+* new shortcut r for reloading the current list
+* new internationalization (language files for German, English, French, Turkish, Dutch, Czech, Russian, Latvian, traditional and simplified Chinese included)
+* make article id generation more reliable
+* fix some font issues
+* fix JavaScript error in login screen
+* autofocus username on login
+* add open in new window button for mobile view
+* allow choosing tags in article list
+* concurent multiples updates makes no longer duplicates entries
+* Reload items on mark as read
+* anonymizer support
+* selfoss rss feed support tag filtering (?tag=) (thanks a lot to Francis Noel)
+* fix tag render bug
 
 Version 2.3
 * new shortcut library jquery hotkeys (thanks a lot to Sigill)

@@ -6,7 +6,7 @@ html {
 }
  
 body {
-    font:18px/27px 'OpenSansLight', Arial, sans-serif;
+    font: lighter 18px/27px 'OpenSans', Arial, sans-serif;
     background:url(images/bg.gif) repeat;
     height: 100%;
     position:relative;
@@ -51,9 +51,9 @@ input {
         margin-left:15px;
         margin-right:15px;
         margin-top:50px;
-        font:18px/27px 'OpenSansSemibold', Arial, sans-serif;
         color:#d7d7d7;
         background:#3d6d69;
+        font-weight:600;
         font-size:0.9em;
         text-align:center;
         -moz-border-radius:2px;
@@ -73,11 +73,11 @@ input {
     }
     
         #nav-filter li {
-            font: 18px/27px 'OpenSansRegular', Arial, sans-serif;
             color:#6a6a6a;
             padding:5px;
             padding-left:24px;
             margin-top:5px;
+            font-weight:normal;
             font-size:0.9em;
             cursor:pointer;
         }
@@ -97,21 +97,18 @@ input {
             background-color: #E74C3C;
             border-radius: 30px;
             color: white;
-            font-size: 10px;
-            font-weight: 500;
-            line-height: 16px;
+            font-size:0.6em;
+            font-weight: normal;
             min-width: 8px;
             padding: 0 5px 0 5px;
-            margin-top: 6px;
-            position: absolute;
             margin-left: 5px;
+            vertical-align:baseline;
         }
     
     #nav h2 {
         cursor:pointer;
         color:#494949;
         text-transform:uppercase;
-        font:18px/27px 'OpenSansBold', Arial, sans-serif;
         font-size:0.8em;
         margin-left:18px;
         font-weight:bold;
@@ -123,12 +120,12 @@ input {
     
         #nav-tags li {
             position:relative;
-            font: 18px/27px 'OpenSansLight', Arial, sans-serif;
             color:#b9b9b9;
             cursor:pointer;
             padding:5px;
             padding-left:25px;
             padding-right:30px;
+            font-weight:lighter;
             font-size:0.7em;
             
             white-space: nowrap;
@@ -165,11 +162,11 @@ input {
     
         #nav-sources li {
             position:relative;
-            font: 18px/27px 'OpenSansLight', Arial, sans-serif;
             color:#b9b9b9;
             cursor:pointer;
             padding-left:25px;
             padding-right:30px;
+            font-weight:lighter;
             font-size:0.7em;
             
             white-space: nowrap;
@@ -183,6 +180,11 @@ input {
             color:#d7d7d7;
         }
         
+        #nav-sources li.unread{
+            font-weight: bold;
+            font-size: 0.7em;
+        }
+    
     #nav .unread {
         font-size:0.9em;
         vertical-align:sub;
@@ -331,23 +333,26 @@ input {
     padding-bottom:20px;
 }
 
+    #content .stream-empty {
+        text-align:center;
+    }
 
     #content.loading {
         background:url(images/ajax-loader-big.gif) center center no-repeat;
-        min-height:100%
+        min-height:90%
     }
 
 .entry ,
 .source {
-    margin:5px 50px 5px 5px;
-    padding:5px;
+    margin:1px 50px 3px 5px; 
+    padding:5px; 
     -moz-border-radius:4px;
     -webkit-border-radius:4px;
     -khtml-border-radius:4px;
     border-radius:4px;
     background:rgba(255, 255, 255, 0.4);
     position:relative;
-    font: 18px/27px 'OpenSansRegular', Arial, sans-serif;
+    font-weight:normal;
     font-size:0.9em;
     border: 1px solid rgba(255, 255, 255, 0);
 }
@@ -371,7 +376,9 @@ input {
     .entry-tags,
     .entry-tags-tag {
         display:inline;
+        font-weight:normal;
         margin-right:5px;
+        cursor:pointer;
     }
 
     .entry-title {
@@ -392,7 +399,7 @@ input {
         border-radius:4px;
         padding:2px;
         font-size:0.8em;
-        
+        white-space:nowrap;
     }
     
     .entry-content {
@@ -419,10 +426,34 @@ input {
             max-width:99%;
         }
         
+        .entry-content p {
+            margin-bottom:0.6em;
+        }
+        
+        .entry-content ol li {
+			list-style:decimal inside;
+		}
+
+        .entry-content li {
+            margin:0.3em;
+            list-style:disc inside;
+        }
+
+        .entry-content blockquote {
+            padding:1px 10px;
+            border-left: 2px solid #eaeaea;
+        }
+
         .entry-content.entry-content-short {
             -moz-column-count: 1;
             -webkit-column-count: 1;
             column-count: 1;
+            max-width: 750px;
+        }
+        
+        .entry-content pre,
+        .entry-content blockquote {
+            overflow-x: auto;
         }
     
     .entry-icon,
@@ -436,6 +467,7 @@ input {
     }
     
     .entry-source,
+    .entry-separator,
     .entry-datetime {
         display:inline;
         color:#aaa;
@@ -490,20 +522,38 @@ input {
             background-image:url(images/arrow-down.png);
         }
         
-        .entry-toolbar .entry-newwindow {
+        .entry-newwindow {
             background-image:url(images/open.png);
+        }
+        
+        .entry-toolbar .entry-sharegoogle {
+            border-left:1px solid #CCC;
+            padding-left:30px;
+            background-position: 10px center;
         }
         
         .entry-sharegoogle {
             background-image:url(images/googleplus.png);
         }
         
-        .entry-sharetwitter {
-            background-image:url(images/twitter.ico);
+        .entry-smartphone-share li.entry-sharetwitter,
+        .entry-toolbar li.entry-sharetwitter {
+            background-image:url(images/twitter.png);
+            background-size:16px 12px;
         }
         
         .entry-sharefacebook {
-            background-image:url(images/facebook.ico);
+            background-image:url(images/facebook.png);
+        }
+        
+        .entry-sharepocket {
+            background-image:url(images/pocket.png);
+        }
+    
+        .entry-smartphone-share li.entry-shareemail,
+        .entry-toolbar li.entry-shareemail {
+            background-image:url(images/mail.png);
+            background-size:16px 10px;
         }
         
         .entry-toolbar .entry-close {
@@ -548,6 +598,10 @@ input {
         
 /* sources */
 
+.source input {
+    width:60%;
+}
+
 .source-title {
     display:inline;
     color:#333333;
@@ -555,6 +609,10 @@ input {
 
 .source-error {
     color:#ff0000;
+}
+
+.source.error {
+    border: 1px solid #e74c3c;
 }
 
 .source-edit-delete,
@@ -614,19 +672,28 @@ input {
     text-decoration:none;
 }
 
+.source-add, .source-export {
+    font-size:0.85em;
+}
+
 .source-add {
     cursor:pointer;
-    font-size:0.85em;
     margin-left:20px;
     float:left;
 }
 
+.source-export {
+    margin-right: 75px;
+    float: right;
+    
+}
+
+.source-export,
 .source-opml {
     font-size:0.60em;
     text-decoration:none;
     color:#777;
     margin-left:10px;
-    clear:both;
 }
 
 .source-new .source-edit-form {
@@ -650,7 +717,7 @@ input {
 
     #login h1 {
         background:url(images/logo.png) left center no-repeat;
-        font-family:'OpenSansSemibold', Arial, sans-serif;
+        font-weight:600;
         padding-top:10px;
         padding-left:40px;
         font-size:1.4em;
@@ -659,7 +726,7 @@ input {
     
     #login label {
         display:inline-block;
-        width:100px;
+        width:135px;
     }
 
     #login .error {
@@ -672,6 +739,64 @@ input {
         font-size:1.2em;
     }
 
+/* opml import */
+
+#opmlbody {
+    height:auto;
+}
+
+#opml {
+    margin-left: auto;
+    margin-right: auto;
+    margin-top: 150px;
+    width: 500px;
+}
+
+    #opml h1 {
+        background:url(images/logo.png) left center no-repeat;
+        font-family:'OpenSansSemibold', Arial, sans-serif;
+        padding-top:10px;
+        padding-left:40px;
+        font-size:1.4em;
+        margin-bottom:20px;
+    }
+
+    #opml .msg {
+        padding: 8px;
+        border-radius:8px;
+        margin-top: 15px;
+    }
+
+    #opml .error {
+        background-color: #ffcccc;
+    }
+
+    #opml .success {
+        background-color: #ffcc00;
+    }
+
+    #opml li.center, #opml li.button {
+        text-align: center;
+    }
+
+    #opml .button input {
+        margin-left:7px;
+        padding:9px;
+        margin-top: 30px;
+        font-size:1.2em;
+    }
+
+    #opml label {
+        display: inline-block;
+        width: 100px;
+    }
+
+    #opml input {
+        margin-top: 30px;
+        background:white;
+    }
+    
+    
 /* public mode */
 
 body.publicmode.notloggedin #nav-mark {
@@ -693,7 +818,7 @@ body.publicmode.notloggedin .entry-unread {
 @media screen and (min-width: 1024px) {
 
     body.publicmode.notloggedin  .entry-toolbar {
-        display:none !important;
+        display:none;
     }
 
 }
@@ -742,6 +867,10 @@ body.publicmode.notloggedin .entry-unread {
         cursor:pointer;
         padding:5px;
         font-size:1.1em;
+    }
+    
+    #content .stream-empty {
+        padding-top:20px;
     }
     
     #nav-settings.nologin {
@@ -808,7 +937,7 @@ body.publicmode.notloggedin .entry-unread {
             display:block;
         }
    
-    .entry-newwindow {
+    .entry-toolbar .entry-newwindow {
         display:none;
     }
 
@@ -832,6 +961,10 @@ body.publicmode.notloggedin .entry-unread {
     .source-add { 
         margin-left:20px;
         text-align:left;
+    }
+
+    .source-export {
+        margin-right:20px;
     }
 }
 
@@ -963,6 +1096,7 @@ body.publicmode.notloggedin .entry-unread {
         }
         
         .entry-source,
+        .entry-separator,
         .entry-datetime {
             color:#3d6d69;
         }
@@ -1037,14 +1171,24 @@ body.publicmode.notloggedin .entry-unread {
         display:block;
         margin-top:10px;
         margin-bottom:10px;
-        height:20px;
+        height:50px;
     }
     
         .entry-smartphone-share li {
             float:left;
             margin-right:10px;
+            margin-bottom:5px;
             list-style:none;
         }
+        
+    .source-opml,
+    .source-export {
+        display:none;
+    }
+    
+    .source-add {
+        float:none;
+    }
 }
 
 
